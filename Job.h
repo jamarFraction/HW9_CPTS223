@@ -4,6 +4,8 @@ using std::string;
 
 class Job{
 
+    public:
+    
     Job(int passedJobID, string passedJobDescription, int passed_n_procs, int passed_n_ticks){
 
         this->jobID = passedJobID;
