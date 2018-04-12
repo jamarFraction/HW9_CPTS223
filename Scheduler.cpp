@@ -30,35 +30,31 @@ void Scheduler::RunScheduler(ifstream &inputFile){
 
 void Scheduler::RunScheduler(){
 
-    string userInput = "";
+    //controls the continued prompts for more job inserts
+    bool terminate = false;
+
+    //clear and ignore what ever may exist in the terminal, will cause issues with input
+    system("clear");
+    cin.ignore();
+
 
     do{
+
+        this->currentTickLog = "";
+
+        //Run the tick function
+        terminate = Tick();
+
         system("clear");
-        cout << "Please enter a new job with values separated by spaces (ex. job_description n_procs n_ticks): ";
-        cin.ignore();
-        getline(cin, userInput);
 
-        //user wants to create a new job
-        if(userInput != "NULL" || userInput != "exit"){
+        //Increment the tick and display log info
+        this->numberOfTicks += 1;
 
-            //create a job with the passed string
-            Job newJob = CreateJob(userInput);
+        cout << "Tick #" << this->numberOfTicks << endl; 
 
-            //attempt to insert the job into the waiting queue
+        DisplayTickLog();
 
-
-        }
-
-        //Perform the Tick
-        if(userInput != "exit"){
-
-            //perform the tick
-
-        }
-
-    }while(userInput != "exit");
-
-
+    }while(terminate == false);
 }
 
 Job Scheduler::CreateJob(string line){
@@ -98,29 +94,59 @@ Job Scheduler::CreateJob(string line){
 
 void Scheduler::Tick(ifstream &inputFile){
 
-    if(!inputFile.eof()){
+    //read a line from the file
+    string line = "";
 
-        //read a line from the file
-        string line = "";
+    getline(inputFile, line);
 
-        getline(inputFile, line);
+    //verify that this line is not a NULL job
+    if(line.substr(0, line.find(" ")) != "NULL"){
 
-        //verify that this line is not a NULL job
-        if(line.substr(0, line.find(" ")) != "NULL"){
-
-            Job newJob = CreateJob(line);
+        Job newJob = CreateJob(line);
 
             //attempt to insert the job into the waiting queue
-            InsertJob(newJob);
-            
+            InsertJob(newJob);  
         }
+    
+}
+
+bool Scheduler::Tick(){
+
+    string userInput = "";
+
+    system("clear");
+    cout << "Please enter a new job with values separated by spaces (ex. job_description n_procs n_ticks): ";
+    //cin.ignore();
+    getline(cin, userInput);
+
+    //user wants to create a new job
+    if(userInput != "NULL" || userInput != "exit"){
+
+        //create a job with the passed string
+        Job newJob = CreateJob(userInput);
+
+        //attempt to insert the job into the waiting queue
+        InsertJob(newJob);
     }
+
+    if(userInput == "exit"){
+
+        //return immediately 
+        return true;
+
+    }
+
+    //continue with tick process
+
+
+    
+    return false;
 }
 
 void Scheduler::InsertJob(Job &newJob){
 
     //Verify that the cluster has sufficient processors to handle the job
-    if(newJob.Get_N_Procs() <= this->processorCount){
+    if(newJob.Get_N_Procs() <= this->processorCount && newJob.Get_N_Ticks() > 0){
 
         //Cluster has sufficient processors to handle the job, so insert into wait queue
         this->waitQueue.insert(newJob);
@@ -131,7 +157,7 @@ void Scheduler::InsertJob(Job &newJob){
         //add this error to the tick log
         string error = "Error inserting job: " + to_string(newJob.GetJobID()) + " " + newJob.GetJobDescription() +
         " " + to_string(newJob.Get_N_Procs()) + " " + to_string(newJob.Get_N_Ticks()) + 
-        ", required processors larger than cluster processor size\n";
+        ", required processors larger than cluster processor size OR ticks <= 0\n";
         
         this->currentTickLog += error;
     }
@@ -145,20 +171,3 @@ void Scheduler::DisplayTickLog(){
     cout << this->currentTickLog;
 
 }
-
-//while(!inputFile.eof()){
-
-    //     //read a line from the file
-    //     string line = "";
-
-    //     getline(inputFile, line);
-
-    //     //verify that this line is not a NULL job
-    //     if(line.substr(0, line.find(" ")) != "NULL"){
-
-    //         Job newJob = CreateJob(line);
-
-    //         //attempt to insert the job into the waiting queue
-
-    //     }
-    // }

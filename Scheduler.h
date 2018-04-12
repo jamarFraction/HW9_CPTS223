@@ -58,7 +58,7 @@ class Scheduler{
     void InsertJob(Job &newJob);
 
     //User ticks
-    void Tick();
+    bool Tick();
 
     //Ticks using input file (for test)
     void Tick(ifstream &inputFile);
