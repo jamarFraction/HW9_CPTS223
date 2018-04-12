@@ -27,6 +27,8 @@ class Scheduler{
 
     private:
 
+    BinaryHeap waitQueue;
+
     //free processor count
     int freeProcessors;
 

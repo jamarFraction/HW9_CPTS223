@@ -3,6 +3,7 @@
 Scheduler::Scheduler(int numberOfProcessors){
 
     this->freeProcessors = numberOfProcessors;
+
 }
 
 Scheduler::~Scheduler(){}
@@ -23,8 +24,10 @@ void Scheduler::RunScheduler(ifstream &inputFile){
 
             Job newJob = createJob(line);
 
+            waitQueue.insert(newJob);
+
         }
-    }      
+    }
 }
 
 Job Scheduler::createJob(string line){

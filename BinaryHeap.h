@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-// BinaryHeap class
+// Job BinaryHeap class
 //
 // CONSTRUCTION: with an optional capacity (that defaults to 100)
 //
@@ -18,17 +18,17 @@ using namespace std;
 // ******************ERRORS********************************
 // Throws UnderflowException as warranted
 
-template <typename Comparable>
+
 class BinaryHeap
 {
   public:
-    explicit BinaryHeap(int capacity = 100)
+    BinaryHeap(int capacity = 100)
         : array(capacity + 1), currentSize{0}
     {
     }
 
-    explicit BinaryHeap(const vector<Comparable> &items)
-        : array(items.size() + 10), currentSize{items.size()}
+    explicit BinaryHeap(const vector<Job> &items)
+        : array(items.size() + 10), currentSize{static_cast<int>(items.size())}
     {
         for (int i = 0; i < items.size(); ++i)
             array[i + 1] = items[i];
@@ -44,7 +44,7 @@ class BinaryHeap
      * Find the smallest item in the priority queue.
      * Return the smallest item, or throw Underflow if empty.
      */
-    const Comparable &findMin() const
+    const Job &findMin() const
     {
         if (isEmpty())
             throw UnderflowException{};
@@ -54,17 +54,17 @@ class BinaryHeap
     /**
      * Insert item x, allowing duplicates.
      */
-    void insert(const Comparable &x)
+    void insert(Job &x)
     {
         if (currentSize == array.size() - 1)
             array.resize(array.size() * 2);
 
         // Percolate up
         int hole = ++currentSize;
-        Comparable copy = x;
+        Job copy = x;
 
         array[0] = std::move(copy);
-        for (; x < array[hole / 2]; hole /= 2)
+        for (; x.Get_N_Ticks() < array[hole / 2].Get_N_Ticks(); hole /= 2)
             array[hole] = std::move(array[hole / 2]);
         array[hole] = std::move(array[0]);
     }
@@ -72,14 +72,14 @@ class BinaryHeap
     /**
      * Insert item x, allowing duplicates.
      */
-    void insert(Comparable &&x)
+    void insert(Job &&x)
     {
         if (currentSize == array.size() - 1)
             array.resize(array.size() * 2);
 
         // Percolate up
         int hole = ++currentSize;
-        for (; hole > 1 && x < array[hole / 2]; hole /= 2)
+        for (; hole > 1 && x.Get_N_Ticks() < array[hole / 2].Get_N_Ticks(); hole /= 2)
             array[hole] = std::move(array[hole / 2]);
         array[hole] = std::move(x);
     }
@@ -101,7 +101,7 @@ class BinaryHeap
      * Remove the minimum item and place it in minItem.
      * Throws Underflow if empty.
      */
-    void deleteMin(Comparable &minItem)
+    void deleteMin(Job &minItem)
     {
         if (isEmpty())
             throw UnderflowException{};
@@ -117,8 +117,8 @@ class BinaryHeap
     }
 
   private:
-    int currentSize;          // Number of elements in heap
-    vector<Comparable> array; // The heap array
+    int currentSize;   // Number of elements in heap
+    vector<Job> array; // The heap array
 
     /**
      * Establish heap order property from an arbitrary
@@ -137,14 +137,14 @@ class BinaryHeap
     void percolateDown(int hole)
     {
         int child;
-        Comparable tmp = std::move(array[hole]);
+        Job tmp = std::move(array[hole]);
 
         for (; hole * 2 <= currentSize; hole = child)
         {
             child = hole * 2;
-            if (child != currentSize && array[child + 1] < array[child])
+            if (child != currentSize && array[child + 1].Get_N_Ticks() < array[child].Get_N_Ticks())
                 ++child;
-            if (array[child] < tmp)
+            if (array[child].Get_N_Ticks() < tmp.Get_N_Ticks())
                 array[hole] = std::move(array[child]);
             else
                 break;
