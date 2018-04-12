@@ -2,8 +2,9 @@
 
 Scheduler::Scheduler(int numberOfProcessors){
 
+    //Init the cluster processor size and the number of free processors
+    this->processorCount = numberOfProcessors;
     this->freeProcessors = numberOfProcessors;
-
 }
 
 Scheduler::~Scheduler(){}
@@ -11,26 +12,56 @@ Scheduler::~Scheduler(){}
 
 void Scheduler::RunScheduler(ifstream &inputFile){
 
-    
+    system("clear");
+
     while(!inputFile.eof()){
 
-        //read a line from the file
-        string line = "";
+        this->numberOfTicks += 1;
+        cout << "Tick #" << this->numberOfTicks << endl;
 
-        getline(inputFile, line);
+        //Perform the tick
+        Tick(inputFile);
 
-        //verify that this line is not a NULL job
-        if(line.substr(0, line.find(" ")) != "NULL"){
+        //Display the tick log
+        DisplayTickLog();
+    };
 
-            Job newJob = createJob(line);
-
-            waitQueue.insert(newJob);
-
-        }
-    }
 }
 
-Job Scheduler::createJob(string line){
+void Scheduler::RunScheduler(){
+
+    string userInput = "";
+
+    do{
+        system("clear");
+        cout << "Please enter a new job with values separated by spaces (ex. job_description n_procs n_ticks): ";
+        cin.ignore();
+        getline(cin, userInput);
+
+        //user wants to create a new job
+        if(userInput != "NULL" || userInput != "exit"){
+
+            //create a job with the passed string
+            Job newJob = CreateJob(userInput);
+
+            //attempt to insert the job into the waiting queue
+
+
+        }
+
+        //Perform the Tick
+        if(userInput != "exit"){
+
+            //perform the tick
+
+        }
+
+    }while(userInput != "exit");
+
+
+}
+
+Job Scheduler::CreateJob(string line){
 
     //Line processing done by breaking the line up into chunks
 
@@ -65,3 +96,69 @@ Job Scheduler::createJob(string line){
     return Job(jobID, jobDescription, n_procs, n_ticks);
 }
 
+void Scheduler::Tick(ifstream &inputFile){
+
+    if(!inputFile.eof()){
+
+        //read a line from the file
+        string line = "";
+
+        getline(inputFile, line);
+
+        //verify that this line is not a NULL job
+        if(line.substr(0, line.find(" ")) != "NULL"){
+
+            Job newJob = CreateJob(line);
+
+            //attempt to insert the job into the waiting queue
+            InsertJob(newJob);
+            
+        }
+    }
+}
+
+void Scheduler::InsertJob(Job &newJob){
+
+    //Verify that the cluster has sufficient processors to handle the job
+    if(newJob.Get_N_Procs() <= this->processorCount){
+
+        //Cluster has sufficient processors to handle the job, so insert into wait queue
+        this->waitQueue.insert(newJob);
+
+
+    }else{
+
+        //add this error to the tick log
+        string error = "Error inserting job: " + to_string(newJob.GetJobID()) + " " + newJob.GetJobDescription() +
+        " " + to_string(newJob.Get_N_Procs()) + " " + to_string(newJob.Get_N_Ticks()) + 
+        ", required processors larger than cluster processor size\n";
+        
+        this->currentTickLog += error;
+    }
+
+
+}
+
+void Scheduler::DisplayTickLog(){
+
+    //print the current tick log to the console 
+    cout << this->currentTickLog;
+
+}
+
+//while(!inputFile.eof()){
+
+    //     //read a line from the file
+    //     string line = "";
+
+    //     getline(inputFile, line);
+
+    //     //verify that this line is not a NULL job
+    //     if(line.substr(0, line.find(" ")) != "NULL"){
+
+    //         Job newJob = CreateJob(line);
+
+    //         //attempt to insert the job into the waiting queue
+
+    //     }
+    // }

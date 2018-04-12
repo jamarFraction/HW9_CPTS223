@@ -9,28 +9,32 @@ using std::ifstream;
 
 int main(void){
 
-    int p;
+    int user_input;
 
+    
     do{
     
         system("clear");
         cout << "Please enter the number of processors to be used in this cluster: ";
-        cin >> p;
+        cin >> user_input;
+        //user_input = (int)user_input;
         
 
-    }while(p <= 0);
+    }while(user_input <= 0);
 
     //create a new scheduler instance
-    Scheduler newScheduler = Scheduler(p);
+    Scheduler newScheduler = Scheduler(user_input);
 
+    
     //Init the job list file
     ifstream input("input.txt");
 
     //check for the file being open before proceeding
     if(input.is_open()){
 
-        //run the scheduler
+        //run the scheduler.. for test inputs
         newScheduler.RunScheduler(input);
+        //newScheduler.RunScheduler();
         
 
     }else{
@@ -42,17 +46,3 @@ int main(void){
 
     return 0;
 }
-
-
-
-// BinaryHeap<int> newHeap = BinaryHeap<int>(1);
-
-    // newHeap.insert(24);
-
-    // newHeap.insert(6);
-
-    // newHeap.insert(12);
-
-    
-
-    // cout << newHeap.findMin() << endl;
