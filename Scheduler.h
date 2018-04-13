@@ -6,7 +6,7 @@
 #include "Job.h"
 #include "BinaryHeap.h"
 
-using std::ifstream;
+using std::istream;
 using namespace std;
 
 class Scheduler{
@@ -17,6 +17,7 @@ class Scheduler{
     //
     // ******************PUBLIC OPERATIONS*********************
     // void RunScheduler(ifstream &inputFile)  --> Run the scheduler with the passed input job list
+    // void RunScheduler()                     --> Run the scheduler for manual entry
     
 
     public: 
@@ -25,7 +26,7 @@ class Scheduler{
     ~Scheduler();
 
     //Scheduler driver for testing
-    void RunScheduler(ifstream &inputFile);
+    void RunScheduler(istream &inputFile);
 
     //Scheduler driver for user input
     void RunScheduler();
@@ -51,20 +52,30 @@ class Scheduler{
     //String representation of the sequence of events/errors for the current tick
     string currentTickLog;
 
+    //Private Class Functions
+    //*******************************************************************************
+    //*******************************************************************************
+    //*******************************************************************************
+
+    //Controls a tick process in its entirety, returns true if user enters "exit" in job prompt
+    bool Tick(istream &inputFile = std::cin);
+
     //function that given the string representation of a job will return a Job object
+    //format "description n_procs n_ticks"
     Job CreateJob(string line);
 
     //Job insertion function
     void InsertJob(Job &newJob);
 
-    //User ticks
-    bool Tick();
-
-    //Ticks using input file (for test)
-    void Tick(ifstream &inputFile);
-
     //Displays the log containing the tick log
     void DisplayTickLog();
+
+    //Creates a job or not --- inserts into the waiting queue based on file input
+    void AutoLine_JobCreate(istream &inputFile);
+
+    //Creates a job or not --- inserts into the waiting queue based on user input
+    //root determinant of termination of Scheduler
+    bool ManualLine_JobCreate();
 };
 
 

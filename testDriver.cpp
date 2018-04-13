@@ -5,7 +5,7 @@
 #include "Scheduler.h"
 
 using namespace std;
-using std::ifstream;
+using std::istream;
 
 int main(void){
 
@@ -33,7 +33,7 @@ int main(void){
     if(input.is_open()){
 
         //run the scheduler.. for test inputs
-        newScheduler.RunScheduler(input);
+        newScheduler.RunScheduler();
         
         
 

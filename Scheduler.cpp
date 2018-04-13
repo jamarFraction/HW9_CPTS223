@@ -10,21 +10,28 @@ Scheduler::Scheduler(int numberOfProcessors){
 Scheduler::~Scheduler(){}
 
 
-void Scheduler::RunScheduler(ifstream &inputFile){
+void Scheduler::RunScheduler(istream &inputFile){
 
     system("clear");
 
-    while(!inputFile.eof()){
+    bool terminate = false;
+
+    while(!inputFile.eof() || terminate){
+
+        this->currentTickLog = "";
 
         this->numberOfTicks += 1;
+
         cout << "Tick #" << this->numberOfTicks << endl;
 
         //Perform the tick
-        Tick(inputFile);
+        terminate = Tick(inputFile);
 
         //Display the tick log
         DisplayTickLog();
     };
+
+    
 
 }
 
@@ -92,7 +99,42 @@ Job Scheduler::CreateJob(string line){
     return Job(jobID, jobDescription, n_procs, n_ticks);
 }
 
-void Scheduler::Tick(ifstream &inputFile){
+bool Scheduler::Tick(istream &inputFile){
+
+    //an istream will have a gcount of 0 if a file
+    std::streamsize size = inputFile.gcount();
+
+    if(size == 0){
+
+        //user input, NOT reading from a file
+        //perform the text file line read and job creation
+        this->AutoLine_JobCreate(inputFile);
+        
+    }else{
+
+        //perform the manual line entry and job creation
+        //exit command from user will end the program and set terminate to true
+        bool terminate = this->ManualLine_JobCreate();
+
+        //terminate this tick, susequently terminating the program
+        if(terminate == true){
+
+            return terminate;
+        }
+    }
+
+    //check for a non-empty waiting queue
+    if(this->waitQueue.isEmpty() == false){
+
+    }
+
+    //do stuff
+
+    //do more stuff
+    return false;
+}
+
+void Scheduler::AutoLine_JobCreate(istream &inputFile){
 
     //read a line from the file
     string line = "";
@@ -104,13 +146,12 @@ void Scheduler::Tick(ifstream &inputFile){
 
         Job newJob = CreateJob(line);
 
-            //attempt to insert the job into the waiting queue
-            InsertJob(newJob);  
-        }
-    
+        //attempt to insert the job into the waiting queue
+        InsertJob(newJob);  
+    }
 }
 
-bool Scheduler::Tick(){
+bool Scheduler::ManualLine_JobCreate(){
 
     string userInput = "";
 
@@ -120,7 +161,7 @@ bool Scheduler::Tick(){
     getline(cin, userInput);
 
     //user wants to create a new job
-    if(userInput != "NULL" || userInput != "exit"){
+    if(userInput != "NULL" && userInput != "exit"){
 
         //create a job with the passed string
         Job newJob = CreateJob(userInput);
@@ -131,15 +172,10 @@ bool Scheduler::Tick(){
 
     if(userInput == "exit"){
 
-        //return immediately 
+        //true return will end the program 
         return true;
-
     }
 
-    //continue with tick process
-
-
-    
     return false;
 }
 
