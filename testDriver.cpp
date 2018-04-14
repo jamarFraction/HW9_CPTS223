@@ -33,8 +33,7 @@ int main(void){
     if(input.is_open()){
 
         //run the scheduler.. for test inputs
-        newScheduler.RunScheduler();
-        
+        newScheduler.RunScheduler(input);
         
 
     }else{

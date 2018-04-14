@@ -300,3 +300,4 @@ __pycache__/
 *.json
 HW9
 *.plist
+.DS_Store

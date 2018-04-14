@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Job.h"
 #include "BinaryHeap.h"
+#include "JobQueue.h"
 
 using std::istream;
 using namespace std;
@@ -36,6 +37,9 @@ class Scheduler{
 
     //wait queue for holding jobs
     BinaryHeap waitQueue;
+
+    //Running job queue
+    JobQueue runningJobQueue;
 
     //Max number of processors capable of running in this cluster
     int processorCount;
@@ -76,6 +80,28 @@ class Scheduler{
     //Creates a job or not --- inserts into the waiting queue based on user input
     //root determinant of termination of Scheduler
     bool ManualLine_JobCreate();
+
+    //returns the job in the wait queue requiring the least amount of processors
+    Job FindShortest();
+
+    //returns true if there are sufficient processors availble to initiate the
+    //passed job during the current tick
+    bool CheckAvailability(Job &minJob) const;
+
+    //Removes the shortest n_procs Job from the wait queue
+    void DeleteShortest();
+
+    //Insert the job into the running pool
+    void RunJob(Job &newJob);
+
+    //Process the wait queue by inserting shortest length jobs into running queue
+    void ProcessWaitQueue();
+
+    //Decrements the number of remaining ticks for each job in the running queue
+    void DecrementTimer();
+
+    //Releases processors to free pool as jobs complete
+    void ReleaseProcs();
 };
 
 

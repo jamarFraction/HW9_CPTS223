@@ -1,3 +1,6 @@
+#ifndef JOB_H
+#define JOB_H
+
 #include <string>
 
 using std::string;
@@ -41,3 +44,5 @@ class Job{
     int n_ticks;
 
 };
+
+#endif
