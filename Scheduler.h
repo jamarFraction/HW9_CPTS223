@@ -10,7 +10,8 @@
 using std::istream;
 using namespace std;
 
-class Scheduler{
+class Scheduler
+{
 
     // Scheduler class
     //
@@ -19,9 +20,8 @@ class Scheduler{
     // ******************PUBLIC OPERATIONS*********************
     // void RunScheduler(ifstream &inputFile)  --> Run the scheduler with the passed input job list
     // void RunScheduler()                     --> Run the scheduler for manual entry
-    
 
-    public: 
+  public:
     Scheduler(int numberOfProcessors = 1);
 
     ~Scheduler();
@@ -32,9 +32,7 @@ class Scheduler{
     //Scheduler driver for user input
     void RunScheduler();
 
-
-    private:
-
+  private:
     //wait queue for holding jobs
     BinaryHeap waitQueue;
 
@@ -103,6 +101,4 @@ class Scheduler{
     //Releases processors to free pool as jobs complete
     void ReleaseProcs();
 };
-
-
 #endif

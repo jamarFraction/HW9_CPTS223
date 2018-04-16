@@ -1,19 +1,19 @@
 #include "Job.h"
 
-struct QueueNode{
+struct QueueNode
+{
 
-    public:
+  public:
+    QueueNode() {}
 
-    QueueNode(){}
-
-    QueueNode(Job &newJob){
+    QueueNode(Job &newJob)
+    {
 
         nodeJob = newJob;
 
         this->nextNode = nullptr;
 
         this->remainingTicks = newJob.Get_N_Ticks();
-
     }
 
     Job nodeJob;

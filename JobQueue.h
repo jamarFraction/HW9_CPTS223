@@ -4,30 +4,28 @@
 #include "QueueNode.h"
 #include "Job.h"
 
-class JobQueue{
+class JobQueue
+{
 
-    public:
-
-    JobQueue(){
+  public:
+    JobQueue()
+    {
 
         this->queueHead = nullptr;
-        
     }
 
     void InsertJob(Job &newJob);
 
     bool IsEmpty();
 
-    QueueNode* GetHead();
+    QueueNode *GetHead();
 
     void SetHead(QueueNode *newHead);
 
-
-    private:
-
+  private:
     QueueNode *queueHead;
 
-    QueueNode* CreateNode(Job &newJob);
+    QueueNode *CreateNode(Job &newJob);
 };
 
 #endif

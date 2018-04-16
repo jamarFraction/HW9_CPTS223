@@ -8,10 +8,9 @@ void JobQueue::InsertJob(Job &newJob)
     QueueNode *previous;
 
     //create a new queueNode
-    QueueNode *newNode;// = (QueueNode*)malloc(sizeof(QueueNode));
+    QueueNode *newNode; // = (QueueNode*)malloc(sizeof(QueueNode));
 
     newNode = CreateNode(newJob);
-
 
     //inserting into an empty list
     if (current == nullptr)
@@ -39,21 +38,10 @@ void JobQueue::InsertJob(Job &newJob)
             while (current != nullptr && newNode->remainingTicks >= current->remainingTicks)
             {
 
-                //end of the queue case
-                // if (current->nextNode == nullptr)
-                // {
+                //update the pointers
+                previous = current;
 
-                //     //new node should be inserted at the end of the list
-
-                //     break;
-                // }
-                // else
-                // {
-
-                    //update the pointers
-                    previous = current;
-
-                    current = current->nextNode;
+                current = current->nextNode;
                 // }
             }
 
@@ -75,32 +63,34 @@ void JobQueue::InsertJob(Job &newJob)
     }
 }
 
-QueueNode* JobQueue::CreateNode(Job &newJob){
+QueueNode *JobQueue::CreateNode(Job &newJob)
+{
 
     QueueNode *newNode = new QueueNode(newJob);
-    
+
     return newNode;
 }
 
-bool JobQueue::IsEmpty(){
+bool JobQueue::IsEmpty()
+{
 
-    if(this->queueHead == nullptr){
+    if (this->queueHead == nullptr)
+    {
 
         return true;
-
     }
 
     return false;
 }
 
-QueueNode* JobQueue::GetHead(){
+QueueNode *JobQueue::GetHead()
+{
 
     return this->queueHead;
-
 }
 
-void JobQueue::SetHead(QueueNode *newHead){
+void JobQueue::SetHead(QueueNode *newHead)
+{
 
     this->queueHead = newHead;
-
 }

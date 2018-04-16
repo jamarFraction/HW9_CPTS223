@@ -1,22 +1,24 @@
 #include "Scheduler.h"
 
-Scheduler::Scheduler(int numberOfProcessors){
+Scheduler::Scheduler(int numberOfProcessors)
+{
 
     //Init the cluster processor size and the number of free processors
     this->processorCount = numberOfProcessors;
     this->freeProcessors = numberOfProcessors;
 }
 
-Scheduler::~Scheduler(){}
+Scheduler::~Scheduler() {}
 
-
-void Scheduler::RunScheduler(istream &inputFile){
+void Scheduler::RunScheduler(istream &inputFile)
+{
 
     system("clear");
 
     bool terminate = false;
 
-    while(!terminate){
+    while (!terminate)
+    {
 
         this->currentTickLog = "";
 
@@ -32,7 +34,8 @@ void Scheduler::RunScheduler(istream &inputFile){
     };
 }
 
-void Scheduler::RunScheduler(){
+void Scheduler::RunScheduler()
+{
 
     //controls the continued prompts for more job inserts
     bool terminate = false;
@@ -41,8 +44,8 @@ void Scheduler::RunScheduler(){
     system("clear");
     cin.ignore();
 
-
-    do{
+    do
+    {
 
         this->currentTickLog = "";
 
@@ -54,14 +57,15 @@ void Scheduler::RunScheduler(){
         //Increment the tick and display log info
         this->numberOfTicks += 1;
 
-        cout << "Tick #" << this->numberOfTicks << endl; 
+        cout << "Tick #" << this->numberOfTicks << endl;
 
         DisplayTickLog();
 
-    }while(terminate == false);
+    } while (terminate == false);
 }
 
-Job Scheduler::CreateJob(string line){
+Job Scheduler::CreateJob(string line)
+{
 
     //Line processing done by breaking the line up into chunks
 
@@ -96,58 +100,63 @@ Job Scheduler::CreateJob(string line){
     return Job(jobID, jobDescription, n_procs, n_ticks);
 }
 
-bool Scheduler::Tick(istream &inputFile){
+bool Scheduler::Tick(istream &inputFile)
+{
 
     //an istream will have a gcount of 0 if a file
     std::streamsize size = inputFile.gcount();
 
-    if(size == 0){
+    if (size == 0)
+    {
 
         //user input, NOT reading from a file
         //perform the text file line read and job creation
 
-        if(!inputFile.eof()){
+        if (!inputFile.eof())
+        {
 
             this->AutoLine_JobCreate(inputFile);
-
         }
-        
-        
-    }else{
+    }
+    else
+    {
 
         //perform the manual line entry and job creation
         //exit command from user will end the program and set terminate to true
         bool terminate = this->ManualLine_JobCreate();
 
         //terminate this tick, susequently terminating the program
-        if(terminate == true){
+        if (terminate == true)
+        {
 
             return true;
         }
     }
-    
+
     //Check for the running jobs queue being empty
-    if(!this->runningJobQueue.IsEmpty()){
+    if (!this->runningJobQueue.IsEmpty())
+    {
 
         //decrement the remaining ticks for each Job in the running queue
         DecrementTimer();
 
         //release any jobs and processors associated with them if neccessary
         ReleaseProcs();
-
     }
 
     //check for a non-empty waiting queue
-    if(!this->waitQueue.isEmpty()){
+    if (!this->waitQueue.isEmpty())
+    {
 
         //Process the wait queue
         ProcessWaitQueue();
     }
-  
+
     return false;
 }
 
-void Scheduler::AutoLine_JobCreate(istream &inputFile){
+void Scheduler::AutoLine_JobCreate(istream &inputFile)
+{
 
     //read a line from the file
     string line = "";
@@ -155,21 +164,22 @@ void Scheduler::AutoLine_JobCreate(istream &inputFile){
     getline(inputFile, line);
 
     //verify that this line is not a NULL job
-    if(line.substr(0, line.find(" ")) != "NULL"){
+    if (line.substr(0, line.find(" ")) != "NULL")
+    {
 
         Job newJob = CreateJob(line);
 
         //attempt to insert the job into the waiting queue
-        InsertJob(newJob);  
+        InsertJob(newJob);
 
         //add this event to the current tick log
-        this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() + 
-        "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to waiting job queue\n");
-
+        this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() +
+                                    "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to waiting job queue\n");
     }
 }
 
-bool Scheduler::ManualLine_JobCreate(){
+bool Scheduler::ManualLine_JobCreate()
+{
 
     string userInput = "";
 
@@ -179,7 +189,8 @@ bool Scheduler::ManualLine_JobCreate(){
     getline(cin, userInput);
 
     //user wants to create a new job
-    if(userInput != "NULL" && userInput != "exit"){
+    if (userInput != "NULL" && userInput != "exit")
+    {
 
         //create a job with the passed string
         Job newJob = CreateJob(userInput);
@@ -188,87 +199,92 @@ bool Scheduler::ManualLine_JobCreate(){
         InsertJob(newJob);
 
         //add this event to the current tick log
-        this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() + 
-        "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to waiting job queue\n");
+        this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() +
+                                    "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to waiting job queue\n");
     }
 
-    if(userInput == "exit"){
+    if (userInput == "exit")
+    {
 
-        //true return will end the program 
+        //true return will end the program
         return true;
     }
 
     return false;
 }
 
-void Scheduler::InsertJob(Job &newJob){
+void Scheduler::InsertJob(Job &newJob)
+{
 
     //Verify that the cluster has sufficient processors to handle the job
-    if(newJob.Get_N_Procs() <= this->processorCount && newJob.Get_N_Ticks() > 0){
+    if (newJob.Get_N_Procs() <= this->processorCount && newJob.Get_N_Ticks() > 0)
+    {
 
         //Cluster has sufficient processors to handle the job, so insert into wait queue
         this->waitQueue.insert(newJob);
-
-
-    }else{
+    }
+    else
+    {
 
         //add this error to the tick log
         string error = "Error inserting job: " + to_string(newJob.GetJobID()) + " " + newJob.GetJobDescription() +
-        " " + to_string(newJob.Get_N_Procs()) + " " + to_string(newJob.Get_N_Ticks()) + 
-        ", required processors larger than cluster processor size OR ticks <= 0\n";
-        
+                       " " + to_string(newJob.Get_N_Procs()) + " " + to_string(newJob.Get_N_Ticks()) +
+                       ", required processors larger than cluster processor size OR ticks <= 0\n";
+
         this->currentTickLog += error;
     }
-
-
 }
 
-void Scheduler::DisplayTickLog(){
+void Scheduler::DisplayTickLog()
+{
 
-    //print the current tick log to the console 
+    //print the current tick log to the console
     cout << this->currentTickLog;
-
 }
 
-Job Scheduler::FindShortest(){
+Job Scheduler::FindShortest()
+{
 
     //return a copy of the job in the wait queue requiring the least number of processors
     return this->waitQueue.findMin();
-
 }
 
-bool Scheduler::CheckAvailability(Job &minJob) const{
+bool Scheduler::CheckAvailability(Job &minJob) const
+{
 
     //Do we have enough free processors in the pool?
-    if(this->freeProcessors >= minJob.Get_N_Procs()){
+    if (this->freeProcessors >= minJob.Get_N_Procs())
+    {
 
         return true;
-
     }
 
     return false;
 }
 
-void Scheduler::DeleteShortest(){
+void Scheduler::DeleteShortest()
+{
 
     //remove the job requiring the least number of processors from the queue
     this->waitQueue.deleteMin();
 }
 
-void Scheduler::RunJob(Job &newJob){
+void Scheduler::RunJob(Job &newJob)
+{
 
     //insert the job into the running job queue
     this->runningJobQueue.InsertJob(newJob);
 
     //add this event to the current tick log
-    this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() + 
-    "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to running job queue\n");
-
+    this->currentTickLog.append("Job: " + to_string(newJob.GetJobID()) + "  " + newJob.GetJobDescription() +
+                                "  " + to_string(newJob.Get_N_Procs()) + "  " + to_string(newJob.Get_N_Ticks()) + " added to running job queue\n");
 }
 
-void Scheduler::ProcessWaitQueue(){
+void Scheduler::ProcessWaitQueue()
+{
 
-    do{
+    do
+    {
 
         //find the job requiring the least amout of proccessors
         Job minJob = FindShortest();
@@ -299,20 +315,24 @@ void Scheduler::ProcessWaitQueue(){
                     break;
                 }
             }
-        }else{
+        }
+        else
+        {
 
             break;
         }
     } while (!this->waitQueue.isEmpty());
 }
 
-void Scheduler::DecrementTimer(){
+void Scheduler::DecrementTimer()
+{
 
     //get the head of the queue
     QueueNode *current = this->runningJobQueue.GetHead();
 
     //iterate over each node and decrement its number of remaining ticks by 1
-    while(current != nullptr){
+    while (current != nullptr)
+    {
 
         current->remainingTicks -= 1;
 
@@ -320,14 +340,17 @@ void Scheduler::DecrementTimer(){
     }
 }
 
-void Scheduler::ReleaseProcs(){
+void Scheduler::ReleaseProcs()
+{
 
-    if(this->runningJobQueue.GetHead()->remainingTicks == 0){
+    if (this->runningJobQueue.GetHead()->remainingTicks == 0)
+    {
 
         QueueNode *current = this->runningJobQueue.GetHead();
 
         //Loop until the head of the queue's remaining ticks is not zero
-        while(current != nullptr && current->remainingTicks == 0){
+        while (current != nullptr && current->remainingTicks == 0)
+        {
 
             QueueNode *toDelete = current;
 
@@ -336,15 +359,13 @@ void Scheduler::ReleaseProcs(){
             this->runningJobQueue.SetHead(current);
 
             //add this event to the current tick log
-            this->currentTickLog.append("Job: " + to_string(toDelete->nodeJob.GetJobID()) + "  " + toDelete->nodeJob.GetJobDescription() + 
-            "  " + to_string(toDelete->nodeJob.Get_N_Procs()) + "  " + to_string(toDelete->nodeJob.Get_N_Ticks()) + " complete. Removing from running queue\n");
+            this->currentTickLog.append("Job: " + to_string(toDelete->nodeJob.GetJobID()) + "  " + toDelete->nodeJob.GetJobDescription() +
+                                        "  " + to_string(toDelete->nodeJob.Get_N_Procs()) + "  " + to_string(toDelete->nodeJob.Get_N_Ticks()) + " complete. Removing from running queue\n");
 
             //Release the processors used for this job back into the free pool
             this->freeProcessors += toDelete->nodeJob.Get_N_Procs();
 
             free(toDelete);
         }
-
     }
-
 }

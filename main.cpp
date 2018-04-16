@@ -5,17 +5,19 @@
 using namespace std;
 using std::ifstream;
 
-int main(void){
+int main(void)
+{
 
     int user_input;
-    
-    do{
-    
+
+    do
+    {
+
         system("clear");
         cout << "Please enter the number of processors to be used in this cluster: ";
         cin >> user_input;
-        
-    }while(user_input <= 0);
+
+    } while (user_input <= 0);
 
     //create a new scheduler instance
     Scheduler newScheduler = Scheduler(user_input);

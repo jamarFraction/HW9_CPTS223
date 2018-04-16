@@ -5,11 +5,12 @@
 
 using std::string;
 
-class Job{
+class Job
+{
 
-    public:
-    
-    Job(int passedJobID = 0, string passedJobDescription = "", int passed_n_procs = 0, int passed_n_ticks = 0){
+  public:
+    Job(int passedJobID = 0, string passedJobDescription = "", int passed_n_procs = 0, int passed_n_ticks = 0)
+    {
 
         this->jobID = passedJobID;
         this->jobDescription = passedJobDescription;
@@ -17,24 +18,27 @@ class Job{
         this->n_ticks = passed_n_ticks;
     }
 
-    int GetJobID(){
+    int GetJobID()
+    {
         return jobID;
     }
 
-    string GetJobDescription(){
+    string GetJobDescription()
+    {
         return jobDescription;
     }
 
-    int Get_N_Procs(){
+    int Get_N_Procs()
+    {
         return n_procs;
     }
 
-    int Get_N_Ticks(){
+    int Get_N_Ticks()
+    {
         return n_ticks;
     }
 
-    private:
-
+  private:
     int jobID;
 
     string jobDescription;
@@ -42,7 +46,6 @@ class Job{
     int n_procs;
 
     int n_ticks;
-
 };
 
 #endif
